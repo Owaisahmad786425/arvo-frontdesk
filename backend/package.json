@@ -1,0 +1,8 @@
+{
+  "name": "frontdesk-backend",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "start": "npm --prefix .. start"
+  }
+}

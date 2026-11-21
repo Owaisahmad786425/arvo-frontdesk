@@ -1,0 +1,42 @@
+{
+  "name": "arvo-frontdesk",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.9"
+  },
+  "overrides": {
+    "sequelize": {
+      "uuid": "11.1.1"
+    }
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env backend/server.js",
+    "dev": "node --watch --env-file-if-exists=.env backend/server.js",
+    "seed": "node --env-file-if-exists=.env scripts/seed.js",
+    "agent:create": "node --env-file-if-exists=.env scripts/create-agent.js",
+    "test": "node --test test/sla.test.js",
+    "test:api": "node --env-file-if-exists=.env --test test/api.test.js",
+    "test:browser": "node --env-file-if-exists=.env --test test/browser.test.js",
+    "build": "esbuild frontend/main.jsx --bundle --minify --outfile=public/frontdesk.js",
+    "prestart": "npm run build",
+    "predev": "npm run build",
+    "pretest:browser": "npm run build"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.0",
+    "helmet": "^8.1.0",
+    "luxon": "^3.6.1",
+    "pg": "^8.16.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.1",
+    "prettier": "^3.10.1"
+  }
+}

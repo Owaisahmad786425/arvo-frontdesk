@@ -68,14 +68,14 @@ test("PostgreSQL and HTTP workflows", async (t) => {
       cookies.push(sc.split(";")[0]);
     }
   });
-  const cookie = cookies[0],
-    fields = {
-      subject: "Printer connection",
-      description: "Unable to connect",
-      email: "case@example.org",
-      customer: "Customer",
-      priority: "MEDIUM",
-    };
+  let cookie = cookies[0];
+  const fields = {
+    subject: "Printer connection",
+    description: "Unable to connect",
+    email: "case@example.org",
+    customer: "Customer",
+    priority: "MEDIUM",
+  };
   const cust = await call("/customers", {
     cookie,
     body: { name: "Customer", email: run + "@example.org" },
@@ -103,6 +103,21 @@ test("PostgreSQL and HTTP workflows", async (t) => {
         ),
       );
       assert.deepEqual(rs.map((r) => r.status).sort(), [200, 409]);
+      cookie = cookies[rs.findIndex((r) => r.status === 200)];
+      const loser = cookies[rs.findIndex((r) => r.status === 409)];
+      assert.equal(
+        (
+          await call(path + "/messages", {
+            cookie: loser,
+            body: { type: "PUBLIC", body: "Conflicting answer" },
+          })
+        ).status,
+        409,
+      );
+      assert.equal(
+        (await act({ action: "assign", agentId: null }, loser)).status,
+        409,
+      );
       assert.equal(
         await Audit.count({
           where: { ticketId: ticket.id, event: "ASSIGNMENT" },

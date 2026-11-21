@@ -14,11 +14,17 @@ const labels = {
   ON_TRACK: "On track",
   PAUSED: "Paused",
 };
-const groups = ["All tickets", "Assigned", "Unassigned", "Overdue", "Waiting"];
+const groups = [
+  "All tickets",
+  "My tickets",
+  "Unassigned",
+  "Overdue",
+  "Waiting",
+];
 const icons = ["▦", "◉", "◇", "◷", "◌"];
-const matches = (t, g) =>
+const matches = (t, g, agentId) =>
   g === groups[0] ||
-  (g === "Assigned" && t.agentId != null) ||
+  (g === "My tickets" && t.agentId === agentId) ||
   (g === "Unassigned" && t.agentId == null) ||
   (g === "Overdue" &&
     Object.values(t.sla).some((s) => s.state === "OVERDUE")) ||
@@ -175,7 +181,7 @@ function NewTicket({ submit, busy }) {
     </>
   );
 }
-function Detail({ t, owner, update, busy }) {
+function Detail({ t, owner, agentId, update, busy }) {
   const [body, setBody] = useState(""),
     [kind, setKind] = useState("PUBLIC");
   const base = "/tickets/" + t.id;
@@ -302,7 +308,11 @@ function Detail({ t, owner, update, busy }) {
           />
         </label>
         <button
-          disabled={busy || (t.resolvedAt && kind === "PUBLIC")}
+          disabled={
+            busy ||
+            (kind === "PUBLIC" &&
+              (t.resolvedAt || (t.agentId !== null && t.agentId !== agentId)))
+          }
           className="primary"
         >
           Add message
@@ -375,7 +385,8 @@ function App() {
       await refresh();
     });
   if (!ready) return <p>Loading workspace…</p>;
-  const count = (g) => data.tickets.filter((t) => matches(t, g)).length;
+  const count = (g) =>
+    data.tickets.filter((t) => matches(t, g, data.me.id)).length;
   return (
     <>
       {!data ? (
@@ -484,7 +495,7 @@ function App() {
                       {data.tickets
                         .filter(
                           (t) =>
-                            matches(t, group) &&
+                            matches(t, group, data.me.id) &&
                             [num(t.id), t.subject, t.customer, owner(t.agentId)]
                               .join(" ")
                               .toLowerCase()
@@ -543,6 +554,7 @@ function App() {
             <Detail
               key={modal.id}
               t={modal}
+              agentId={data.me.id}
               owner={owner}
               update={mutate}
               busy={busy}

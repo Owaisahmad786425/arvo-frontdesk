@@ -84,6 +84,8 @@ async function createTicket(input, agent, now = new Date(), outer, parentId) {
         status: t.status,
         priority: t.priority,
         subject: t.subject,
+        firstDue: t.firstDue,
+        resolutionDue: t.resolutionDue,
         ...(parentId ? { previousTicketId: parentId } : {}),
       },
       now,
@@ -230,6 +232,8 @@ async function change(where, agent, input, time) {
       case "claim":
       case "assign": {
         const next = input.action === "claim" ? agent.id : input.agentId;
+        if (t.agentId !== null && t.agentId !== agent.id)
+          fail(409, "This ticket belongs to another agent");
         if (input.action === "claim" && t.agentId !== null)
           fail(409, "Ticket already claimed");
         if (
@@ -256,6 +260,7 @@ async function change(where, agent, input, time) {
           firstBreached: t.firstBreached,
           resolutionBreached: t.resolutionBreached,
           ...deadlines,
+          firstDue: t.firstAt ? t.firstDue : deadlines.firstDue,
         });
         t.priority = next;
         if (!t.firstAt) t.firstDue = deadlines.firstDue;
@@ -273,6 +278,14 @@ async function change(where, agent, input, time) {
           if (!inbound) fail(409, "Reopen the ticket first");
           const followup = await reopenOrFollowup(body);
           if (followup) return followup;
+        }
+        if (!note && !inbound) {
+          if (t.agentId !== null && t.agentId !== agent.id)
+            fail(409, "Only the assigned agent can reply");
+          if (t.agentId === null) {
+            await record("ASSIGNMENT", { from: null, to: agent.id });
+            t.agentId = agent.id;
+          }
         }
         const m = await messages.append(
           t.id,

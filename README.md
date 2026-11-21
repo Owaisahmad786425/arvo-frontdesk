@@ -60,6 +60,8 @@ ON CONFLICT (date) DO NOTHING;
 
 ## API
 
+The **My tickets** queue shows the signed-in agent's assignments. Sending the first public agent reply to an unassigned ticket claims it in the same transaction. Once assigned, only its owner can send public agent replies or hand it to another agent. Teammates can still add private notes.
+
 Prefix the paths below with `/api`. Send JSON bodies and the session cookie for agent requests. A successful ticket creation returns `{ticket, access}`. The customer-scoped token can be used by an integration. Ticket IDs in API paths are integers.
 
 | Method and path | Request / result |

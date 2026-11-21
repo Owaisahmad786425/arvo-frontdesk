@@ -1,6 +1,6 @@
 # Delivery notes
 
-The agent workflows passed the local calendar, PostgreSQL API, and desktop/mobile browser tests. The Render Blueprint is ready. Hosted verification and the one-week availability period are pending Render sign-in.
+The agent workflows passed the local calendar, PostgreSQL API, and desktop/mobile browser tests. The demonstration uses a free Render web service and PostgreSQL database. Reviewers need the demo password from the project owner and access to the private source repository.
 
 - Incoming customer replies can be recorded by an agent or posted with a per-ticket integration key. Connecting a real email or WhatsApp provider would require separate provider credentials.
 - The cleanup job runs inside the Express process. A sleeping or stopped host catches up at startup. Closure records both its effective cutoff and the processing time when they differ.

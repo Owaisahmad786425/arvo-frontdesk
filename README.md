@@ -4,6 +4,8 @@ Frontdesk is Arvo Systems’ shared support queue. Express serves a React agent 
 
 ## Open this checkout
 
+The [hosted Frontdesk demo](https://arvo-frontdesk-yboz.onrender.com/) uses synthetic customer tickets. Sign in as `maya@arvo.example` with the demo password supplied privately by the project owner. The first request after inactivity can take a minute.
+
 Open [the local dashboard](http://127.0.0.1:3000/) and sign in as **maya@arvo.example** with `DEMO_PASSWORD` from the project’s private `.env`. Open a ticket to claim it, reply, record an incoming customer message, add an internal note, change priority, or view its history.
 
 From the project root, start the existing local database after a Windows reboot if needed, then run the app:
